@@ -133,7 +133,7 @@ class MyComponent extends StreamlitComponentBase<State> {
 
   private onClicked = async (): Promise<void> => {
     const { files, message } = this.state;
-    if (files.length > 0 && message) {
+    if (files.length > 0 || message) {
       // Wait for all files to be converted to Base64
       const filesDataPromises = files.map((file: File) => this.fileToBase64(file).then(content => ({
         name: file.name,
@@ -144,7 +144,7 @@ class MyComponent extends StreamlitComponentBase<State> {
   
       const filesData = await Promise.all(filesDataPromises);
   
-      Streamlit.setComponentValue({ files: filesData, message });
+      Streamlit.setComponentValue({ files: filesData, message: message });
     }
     this.setState({ files: [], message: ''});
     console.log("Debugging files:", files);
