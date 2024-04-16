@@ -5,7 +5,9 @@
   "dependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "streamlit-component-lib": "^2.0.0"
+    "streamlit-component-lib": "^2.0.0",
+    "stream-chat": "",
+    "stream-chat-react": ""
   },
   "scripts": {
     "start": "react-scripts start",
