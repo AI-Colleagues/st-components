@@ -154,7 +154,12 @@ class FileChatInput extends StreamlitComponentBase<State> {
       </div>
     )
   }
-
+  private resetFileInput = (): void => {
+    const fileInput = document.getElementById("fileInput") as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = "" // Clear the file input to allow re-adding the same file
+    }
+  }
   private removeFile = (fileToRemove: FileWithPreview): void => {
     URL.revokeObjectURL(fileToRemove.previewUrl)
     this.setState((prevState: any) => ({
@@ -162,6 +167,9 @@ class FileChatInput extends StreamlitComponentBase<State> {
         (file: FileWithPreview) => file !== fileToRemove
       ),
     }))
+
+    // Reset the file input after removing a file
+    this.resetFileInput()
   }
 
   private handleFileChange = (
@@ -204,6 +212,8 @@ class FileChatInput extends StreamlitComponentBase<State> {
       Streamlit.setComponentValue({ files: filesData, message: message })
     }
     this.setState({ files: [], message: "" })
+    // Reset the file input to allow re-adding the same file after submission
+    this.resetFileInput()
     document
       .querySelectorAll('div[style*="position: relative;"]')
       .forEach((element) => element.remove())
