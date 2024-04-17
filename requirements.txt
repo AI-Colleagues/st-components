@@ -1,1 +1,2 @@
 streamlit==1.32.0
+streamlit-float==0.3.2

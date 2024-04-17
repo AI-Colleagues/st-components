@@ -28,7 +28,6 @@ class MyComponent extends StreamlitComponentBase<State> {
   public render = (): ReactNode => {
     // Arguments that are passed to the plugin in Python are accessible
     // via `this.props.args`. Here, we access the "name" arg.
-    const name = this.props.args["name"]
 
     // Streamlit sends us a theme object via props that we can use to ensure
     // that our component has visuals that match the active theme in a
@@ -51,10 +50,9 @@ class MyComponent extends StreamlitComponentBase<State> {
     return (
       <div
         style={{
-          height: "100vh",
           display: "flex",
           width: "100%",
-          flexDirection: "column", // Changed to column to stack elements vertically
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "space-between",
         }}
@@ -218,16 +216,6 @@ class MyComponent extends StreamlitComponentBase<State> {
       reader.onerror = (error) => reject(error)
       reader.readAsDataURL(file)
     })
-  }
-
-  /** Focus handler for our "Click Me!" button. */
-  private _onFocus = (): void => {
-    this.setState({ isFocused: true })
-  }
-
-  /** Blur handler for our "Click Me!" button. */
-  private _onBlur = (): void => {
-    this.setState({ isFocused: false })
   }
 }
 
