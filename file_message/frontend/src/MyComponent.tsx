@@ -83,7 +83,18 @@ class MyComponent extends StreamlitComponentBase<State> {
                 alt="preview"
               />
               <button
-                style={{ position: "absolute", top: "0", right: "0" }}
+                style={{
+                  position: "absolute",
+                  top: "0",
+                  right: "0",
+                  width: "20px", // Set a fixed width
+                  height: "20px", // Set a fixed height to match the width
+                  borderRadius: "50%", // Make the button round
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0", // Remove padding to center the '✖' symbol
+                }}
                 onClick={() => this.removeFile(file)}
               >
                 ✖
