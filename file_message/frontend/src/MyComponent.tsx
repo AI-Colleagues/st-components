@@ -7,10 +7,15 @@ import {
 } from "streamlit-component-lib"
 import React, { ReactNode } from "react"
 
+interface FileWithPreview extends File {
+  previewUrl: string
+  originalFile: File
+}
+
 interface State {
   isFocused: boolean
   message: string
-  files: File[]
+  files: FileWithPreview[]
 }
 
 /**
@@ -43,117 +48,114 @@ class MyComponent extends StreamlitComponentBase<State> {
       style.outline = borderStyling
     }
 
-    // Show a button and some text.
-    // When the button is clicked, we'll increment our "numClicks" state
-    // variable, and send its new value back to Streamlit, where it'll
-    // be available to the Python program.
     return (
       <div
         style={{
+          height: "100vh",
           display: "flex",
+          flexDirection: "column", // Changed to column to stack elements vertically
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <input
-          type="file"
-          id="fileInput"
-          style={{ display: "none" }}
-          multiple
-          onChange={this.handleFileChange}
-        />
-
-        <button
-          className="message-input__button"
-          onClick={() => {
-            const fileInput = document.getElementById("fileInput")
-            if (fileInput) fileInput.click()
+        <div
+          style={{
+            display: "flex", // Ensures horizontal layout
+            flexDirection: "row", // Explicitly set to row for horizontal stacking
+            alignItems: "center", // Align items vertically in the center
+            justifyContent: "flex-start", // Align items to the start of the container
           }}
         >
-          📎
-        </button>
-        <input
-          type="text"
-          className="message-input__input"
-          placeholder="Type a message..."
-          // style={{ flexGrow: 1, margin: '0 10px' }}
-          onChange={this.handleMessageChange}
-          value={this.state.message}
-        />
-        <button
-          onClick={this.onClicked}
-          type="button"
-          className="message-input__button"
+          {this.state.files.map((file: FileWithPreview, index) => (
+            <div
+              key={index}
+              style={{
+                position: "relative",
+                display: "inline-block",
+                marginRight: "5px",
+              }}
+            >
+              <img
+                src={file.previewUrl}
+                style={{ maxWidth: "100px", maxHeight: "100px" }}
+                alt="preview"
+              />
+              <button
+                style={{ position: "absolute", top: "0", right: "0" }}
+                onClick={() => this.removeFile(file)}
+              >
+                ✖
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-          🚀
-        </button>
+          <input
+            type="file"
+            id="fileInput"
+            style={{ display: "none" }}
+            multiple
+            onChange={this.handleFileChange}
+          />
+
+          <button
+            className="message-input__button"
+            onClick={() => {
+              const fileInput = document.getElementById("fileInput")
+              if (fileInput) fileInput.click()
+            }}
+          >
+            📎
+          </button>
+          <input
+            type="text"
+            className="message-input__input"
+            placeholder="Type a message..."
+            // style={{ flexGrow: 1, margin: '0 10px' }}
+            onChange={this.handleMessageChange}
+            value={this.state.message}
+          />
+          <button
+            onClick={this.onClicked}
+            type="button"
+            className="message-input__button"
+          >
+            🚀
+          </button>
+        </div>
       </div>
     )
   }
-  private removeFile = (fileToRemove: File): void => {
+
+  private removeFile = (fileToRemove: FileWithPreview): void => {
+    URL.revokeObjectURL(fileToRemove.previewUrl)
     this.setState((prevState: any) => ({
-      files: prevState.files.filter((file: File) => file !== fileToRemove),
+      files: prevState.files.filter(
+        (file: FileWithPreview) => file !== fileToRemove
+      ),
     }))
   }
 
   private handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    event.persist() // This line ensures the event is not pooled
-    const files = event.target.files ? Array.from(event.target.files) : []
+    const filesWithPreview = event.target.files
+      ? Array.from(event.target.files).map((file) => {
+          const previewUrl = URL.createObjectURL(file)
+          return { ...file, previewUrl, originalFile: file } // Store the original file separately
+        })
+      : []
 
     this.setState((prevState: any) => ({
-      files: [...prevState.files, ...files],
+      files: [...prevState.files, ...filesWithPreview],
     }))
-
-    files.forEach((file: File) => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const thumbnailUrl = e.target?.result
-        if (thumbnailUrl) {
-          const thumbnailWrapper = document.createElement("div")
-          thumbnailWrapper.style.position = "relative"
-          thumbnailWrapper.style.display = "inline-block"
-          thumbnailWrapper.style.marginRight = "5px"
-
-          const thumbnail = document.createElement("img")
-
-          thumbnail.onclick = () => {
-            const originalFileWindow = window.open()
-            if (originalFileWindow) {
-              originalFileWindow.document.write(`<img src="${thumbnailUrl}" />`)
-            }
-          }
-
-          thumbnail.src = thumbnailUrl as string
-          thumbnail.style.maxWidth = "100px"
-          thumbnail.style.maxHeight = "100px"
-          thumbnailWrapper.appendChild(thumbnail)
-
-          const removeButton = document.createElement("span")
-          removeButton.textContent = "✖"
-          removeButton.style.position = "absolute"
-          removeButton.style.top = "0"
-          removeButton.style.right = "0"
-          removeButton.style.cursor = "pointer"
-          removeButton.style.background = "white"
-          removeButton.style.borderRadius = "50%"
-          removeButton.style.width = "20px" // Set width
-          removeButton.style.height = "20px" // Set height
-          removeButton.style.display = "flex"
-          removeButton.style.alignItems = "center"
-          removeButton.style.justifyContent = "center"
-          removeButton.onclick = () => {
-            thumbnailWrapper.remove()
-            this.removeFile(file)
-          }
-          thumbnailWrapper.appendChild(removeButton)
-
-          document.body.appendChild(thumbnailWrapper)
-        }
-      }
-      reader.readAsDataURL(file)
-    })
   }
 
   private handleMessageChange = (
@@ -165,12 +167,13 @@ class MyComponent extends StreamlitComponentBase<State> {
   private onClicked = async (): Promise<void> => {
     const { files, message } = this.state
     if (files.length > 0 || message) {
-      // Wait for all files to be converted to Base64
-      const filesDataPromises = files.map((file: File) =>
-        this.fileToBase64(file).then((content) => ({
-          name: file.name,
-          size: file.size,
-          type: file.type,
+      // Map over the files and convert each one to Base64
+      const filesDataPromises = files.map((fileWithPreview: FileWithPreview) =>
+        this.fileToBase64(fileWithPreview.originalFile).then((content) => ({
+          // Use originalFile here
+          name: fileWithPreview.name,
+          size: fileWithPreview.size,
+          type: fileWithPreview.type,
           content,
         }))
       )
@@ -180,7 +183,6 @@ class MyComponent extends StreamlitComponentBase<State> {
       Streamlit.setComponentValue({ files: filesData, message: message })
     }
     this.setState({ files: [], message: "" })
-    console.log("Debugging files:", files)
     document
       .querySelectorAll('div[style*="position: relative;"]')
       .forEach((element) => element.remove())
@@ -189,6 +191,7 @@ class MyComponent extends StreamlitComponentBase<State> {
   // Helper function to convert a file to a Base64 encoded string
   // Note: This function returns a Promise
   private fileToBase64 = (file: File): Promise<string> => {
+    console.log(file)
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = () => resolve(reader.result as string)
