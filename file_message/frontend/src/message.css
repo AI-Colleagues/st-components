@@ -1,88 +1,88 @@
 .message-input__composer {
-    display: flex;
-    align-items: center;
-    border: 2px solid #00000029;
-    border-radius: 8px;
-  }
-  
-  .message-input__composer:has(.message-input__input:focus) {
-    border-color: #005fff;
-  }
-  
-  .message-input__input {
-    flex-grow: 1;
-    border: 0;
-    outline: 0;
-    background: none;
-    font: inherit;
-    padding: 8px;
-    resize: none;
-  }
-  
-  .message-input__button {
-    border: 1px solid transparent;
-    outline: 0;
-    background: none;
-    font: inherit;
-    border-radius: 4px;
-    margin: 8px;
-    padding: 8px;
-    cursor: pointer;
-  }
-  
-  .message-input__button:hover {
-    background: #fafafa;
-    border-color: #00000014;
-  }
-  
-  .message-input__button:focus,
-  .message-input__button:focus-within {
-    border-color: #005fff;
-  }
-  
-  .visually-hidden {
-    width: 0;
-    height: 0;
-    pointer-events: none;
-  }
+  display: flex;
+  align-items: center;
+  border: 2px solid #00000029;
+  border-radius: 8px;
+}
 
-  .message-input__attachments {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    list-style: none;
-    padding: 0;
-  }
-  
-  .message-input__attachment-preview {
-    position: relative;
-    border-radius: 8px;
-    width: 160px;
-    height: 160px;
-    padding: 8px;
-    border: 1px solid #00000014;
-  }
-  
-  .message-input__attachment-preview_image {
-    background-size: cover;
-    background-position: center;
-    background-clip: border-box;
-    background-repeat: no-repeat;
-  }
-  
-  .message-input__attachment-actions {
-    display: flex;
-    gap: 4px;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    padding: 8px;
-  }
-  
-  .message-input__attachment-action {
-    font: inherit;
-    border-radius: 4px;
-    padding: 4px;
-    background: #fff;
-    border: 1px solid #00000014;
-  }
+.message-input__composer:has(.message-input__input:focus) {
+  border-color: #005fff;
+}
+
+.message-input__input {
+  flex-grow: 1;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: inherit;
+  padding: 8px;
+  resize: none;
+}
+
+.message-input__button {
+  border: 1px solid transparent;
+  outline: 0;
+  background: none;
+  font: inherit;
+  border-radius: 4px;
+  margin: 8px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.message-input__button:hover {
+  background: #fafafa;
+  border-color: #00000014;
+}
+
+.message-input__button:focus,
+.message-input__button:focus-within {
+  border-color: #005fff;
+}
+
+.visually-hidden {
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.message-input__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+}
+
+.message-input__attachment-preview {
+  position: relative;
+  border-radius: 8px;
+  width: 160px;
+  height: 160px;
+  padding: 8px;
+  border: 1px solid #00000014;
+}
+
+.message-input__attachment-preview_image {
+  background-size: cover;
+  background-position: center;
+  background-clip: border-box;
+  background-repeat: no-repeat;
+}
+
+.message-input__attachment-actions {
+  display: flex;
+  gap: 4px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 8px;
+}
+
+.message-input__attachment-action {
+  font: inherit;
+  border-radius: 4px;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #00000014;
+}
