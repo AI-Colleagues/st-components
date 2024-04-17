@@ -129,7 +129,7 @@ const AttachmentActions = ({
 }
 
 const AttachmentUploadButton = () => {
-  const { uploadNewFiles, isUploadEnabled, maxFilesLeft } =
+  const { uploadNewFiles, maxFilesLeft } =
     useMessageInputContext()
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
