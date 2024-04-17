@@ -138,6 +138,11 @@ class MyComponent extends StreamlitComponentBase<State> {
           removeButton.style.cursor = "pointer"
           removeButton.style.background = "white"
           removeButton.style.borderRadius = "50%"
+          removeButton.style.width = "20px" // Set width
+          removeButton.style.height = "20px" // Set height
+          removeButton.style.display = "flex"
+          removeButton.style.alignItems = "center"
+          removeButton.style.justifyContent = "center"
           removeButton.onclick = () => {
             thumbnailWrapper.remove()
             this.removeFile(file)
