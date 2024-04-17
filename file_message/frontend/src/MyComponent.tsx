@@ -53,6 +53,7 @@ class MyComponent extends StreamlitComponentBase<State> {
         style={{
           height: "100vh",
           display: "flex",
+          width: "100%",
           flexDirection: "column", // Changed to column to stack elements vertically
           alignItems: "center",
           justifyContent: "space-between",
@@ -62,6 +63,7 @@ class MyComponent extends StreamlitComponentBase<State> {
           style={{
             display: "flex", // Ensures horizontal layout
             flexDirection: "row", // Explicitly set to row for horizontal stacking
+            width: "100%",
             alignItems: "center", // Align items vertically in the center
             justifyContent: "flex-start", // Align items to the start of the container
           }}
@@ -93,6 +95,8 @@ class MyComponent extends StreamlitComponentBase<State> {
         <div
           style={{
             display: "flex",
+            flexDirection: "row", // Maintain row layout for the controls
+            width: "100%", // Expand the container to full width
             alignItems: "center",
             justifyContent: "space-between",
           }}
@@ -120,6 +124,11 @@ class MyComponent extends StreamlitComponentBase<State> {
             placeholder="Type a message..."
             // style={{ flexGrow: 1, margin: '0 10px' }}
             onChange={this.handleMessageChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                this.onClicked()
+              }
+            }}
             value={this.state.message}
           />
           <button
