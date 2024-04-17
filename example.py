@@ -1,6 +1,6 @@
 import streamlit as st
 
-from file_message import file_chat_input
+from file_chat_input import file_chat_input
 from streamlit_float import float_init
 
 float_init()

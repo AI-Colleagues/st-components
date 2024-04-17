@@ -1,10 +1,10 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import MyComponent from "./MyComponent"
+import FileChatInput from "./FileChatInput"
 
 ReactDOM.render(
   <React.StrictMode>
-    <MyComponent />
+    <FileChatInput />
   </React.StrictMode>,
   document.getElementById("root")
 )
