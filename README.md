@@ -15,15 +15,13 @@ https://github.com/AI-Colleagues/st-components/assets/26806376/40fd6e40-ecc1-411
 
 ### Get started
 
-To test it, first start the 
+To install, run 
 ```bash
-cd file_chat_input/frontend
-npm run start
+pip install file-chat-input
 ```
 
 Then run example app:
 ```bash
-pip install -r requirements.txt
 streamlit run example.py
 ```
 
