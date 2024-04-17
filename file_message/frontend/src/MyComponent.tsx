@@ -1,4 +1,5 @@
-import "./message.css"
+import "./component.css"
+
 import {
   Streamlit,
   StreamlitComponentBase,
@@ -6,181 +7,10 @@ import {
 } from "streamlit-component-lib"
 import React, { ReactNode } from "react"
 
-import {
-  Chat,
-  Channel,
-  ChannelHeader,
-  ChannelList,
-  MessageList,
-  Thread,
-  Window,
-  MessageInput,
-  useMessageInputContext,
-  useComponentContext,
-  ImageUpload,
-  FileUpload,
-  DefaultStreamChatGenerics,
-} from "stream-chat-react"
-
-const CustomAttachmentPreviewList = () => {
-  const { fileOrder = [], imageOrder = [] } = useMessageInputContext()
-
-  if (fileOrder.length === 0 && imageOrder.length === 0) {
-    return null
-  }
-
-  return (
-    <ul className="message-input__attachments">
-      {imageOrder.map((id: string) => (
-        <li className="message-input__attachment" key={id}>
-          <ImageAttachmentPreview id={id} />
-        </li>
-      ))}
-      {fileOrder.map((id: string) => (
-        <li key={id}>
-          <FileAttachmentPreview id={id} />
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-const ImageAttachmentPreview = ({ id }: { id: string }) => {
-  const { imageUploads } = useMessageInputContext()
-  const image = imageUploads[id]
-  const url = image.previewUri ?? image.url ?? "fallback.webm"
-
-  return (
-    <div
-      className="message-input__attachment-preview message-input__attachment-preview_image"
-      style={{ backgroundImage: `url(${url})` }}
-      aria-label={image.file.name}
-    >
-      <AttachmentActions attachment={image} type="image" />
-    </div>
-  )
-}
-
-const FileAttachmentPreview = ({ id }: { id: string }) => {
-  const { fileUploads } = useMessageInputContext()
-  const attachment = fileUploads[id]
-
-  return (
-    <div className="message-input__attachment-preview message-input__attachment-preview_file">
-      📄 {attachment.file.name} <br />({attachment.file.size} bytes)
-      <AttachmentActions attachment={attachment} type="file" />
-    </div>
-  )
-}
-type AttachmentType = "image" | "file"
-
-type CustomAttachment = ImageUpload<DefaultStreamChatGenerics> | FileUpload
-
-const AttachmentActions = ({
-  type,
-  attachment,
-}: {
-  type: AttachmentType
-  attachment: CustomAttachment
-}) => {
-  const { removeImage, uploadImage, removeFile, uploadFile } =
-    useMessageInputContext()
-  let [remove, upload] =
-    type === "image" ? [removeImage, uploadImage] : [removeFile, uploadFile]
-  let children = null
-
-  if (attachment.state === "uploading") {
-    children = (
-      <div className="message-input__attachment-action">Loading...</div>
-    )
-  }
-
-  if (attachment.state === "finished") {
-    children = (
-      <>
-        <a
-          className="message-input__attachment-action"
-          href={attachment.url}
-          target="_blank"
-          rel="noreferrer"
-        >
-          📥
-        </a>
-        <button
-          className="message-input__attachment-action"
-          onClick={() => remove(attachment.id)}
-        >
-          ❌
-        </button>
-      </>
-    )
-  }
-
-  if (attachment.state === "failed") {
-    ;<button
-      className="message-input__attachment-action"
-      onClick={() => upload(attachment.id)}
-    >
-      Failed. Retry?
-    </button>
-  }
-
-  return <div className="message-input__attachment-actions">{children}</div>
-}
-
-const AttachmentUploadButton = () => {
-  const { uploadNewFiles, maxFilesLeft } =
-    useMessageInputContext()
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.currentTarget.files
-
-    if (files && files.length > 0) {
-      uploadNewFiles(files)
-    }
-  }
-
-  if (maxFilesLeft === 0) {
-    return null
-  }
-
-  return (
-    <label className="message-input__button">
-      <input type="file" className="visually-hidden" onChange={handleChange} />
-      📎
-    </label>
-  )
-}
-
-const CustomMessageInput = () => {
-  const { text, handleChange, handleSubmit } = useMessageInputContext()
-  const { AttachmentPreviewList = CustomAttachmentPreviewList } =
-    useComponentContext()
-
-  return (
-    <div className="message-input">
-      <div className="message-input__composer">
-        <AttachmentUploadButton />
-        <textarea
-          className="message-input__input"
-          value={text}
-          onChange={handleChange}
-        />
-        <button
-          type="button"
-          className="message-input__button"
-          onClick={handleSubmit}
-        >
-          ⬆️
-        </button>
-      </div>
-      <AttachmentPreviewList />
-    </div>
-  )
-}
-
 interface State {
   isFocused: boolean
+  message: string
+  files: File[]
 }
 
 /**
@@ -188,7 +18,7 @@ interface State {
  * automatically when your component should be re-rendered.
  */
 class MyComponent extends StreamlitComponentBase<State> {
-  public state = { isFocused: false }
+  public state = { message: "", isFocused: false, files: [] }
 
   public render = (): ReactNode => {
     // Arguments that are passed to the plugin in Python are accessible
@@ -213,20 +43,163 @@ class MyComponent extends StreamlitComponentBase<State> {
       style.outline = borderStyling
     }
 
-    // Show a chat input component. There is a message box, a send button, and a attachment button for attaching images and other files.
+    // Show a button and some text.
+    // When the button is clicked, we'll increment our "numClicks" state
+    // variable, and send its new value back to Streamlit, where it'll
+    // be available to the Python program.
     return (
-      <div>
-        <CustomMessageInput />
-        {/* <Chat> */}
-        {/* <Channel>
-          <Window> */}
-        {/* <MessageInput Input={CustomMessageInput} /> */}
-        {/* </Window>
-          <Thread />
-        </Channel> */}
-        {/* </Chat> */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <input
+          type="file"
+          id="fileInput"
+          style={{ display: "none" }}
+          multiple
+          onChange={this.handleFileChange}
+        />
+
+        <button
+          className="message-input__button"
+          onClick={() => {
+            const fileInput = document.getElementById("fileInput")
+            if (fileInput) fileInput.click()
+          }}
+        >
+          📎
+        </button>
+        <input
+          type="text"
+          className="message-input__input"
+          placeholder="Type a message..."
+          // style={{ flexGrow: 1, margin: '0 10px' }}
+          onChange={this.handleMessageChange}
+          value={this.state.message}
+        />
+        <button
+          onClick={this.onClicked}
+          type="button"
+          className="message-input__button"
+        >
+          🚀
+        </button>
       </div>
     )
+  }
+  private removeFile = (fileToRemove: File): void => {
+    this.setState((prevState: any) => ({
+      files: prevState.files.filter((file: File) => file !== fileToRemove),
+    }))
+  }
+
+  private handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    event.persist() // This line ensures the event is not pooled
+    const files = event.target.files ? Array.from(event.target.files) : []
+
+    this.setState((prevState: any) => ({
+      files: [...prevState.files, ...files],
+    }))
+
+    files.forEach((file: File) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const thumbnailUrl = e.target?.result
+        if (thumbnailUrl) {
+          const thumbnailWrapper = document.createElement("div")
+          thumbnailWrapper.style.position = "relative"
+          thumbnailWrapper.style.display = "inline-block"
+          thumbnailWrapper.style.marginRight = "5px"
+
+          const thumbnail = document.createElement("img")
+
+          thumbnail.onclick = () => {
+            const originalFileWindow = window.open()
+            if (originalFileWindow) {
+              originalFileWindow.document.write(`<img src="${thumbnailUrl}" />`)
+            }
+          }
+
+          thumbnail.src = thumbnailUrl as string
+          thumbnail.style.maxWidth = "100px"
+          thumbnail.style.maxHeight = "100px"
+          thumbnailWrapper.appendChild(thumbnail)
+
+          const removeButton = document.createElement("span")
+          removeButton.textContent = "✖"
+          removeButton.style.position = "absolute"
+          removeButton.style.top = "0"
+          removeButton.style.right = "0"
+          removeButton.style.cursor = "pointer"
+          removeButton.style.background = "white"
+          removeButton.style.borderRadius = "50%"
+          removeButton.onclick = () => {
+            thumbnailWrapper.remove()
+            this.removeFile(file)
+          }
+          thumbnailWrapper.appendChild(removeButton)
+
+          document.body.appendChild(thumbnailWrapper)
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  private handleMessageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    this.setState({ message: event.target.value })
+  }
+
+  private onClicked = async (): Promise<void> => {
+    const { files, message } = this.state
+    if (files.length > 0 || message) {
+      // Wait for all files to be converted to Base64
+      const filesDataPromises = files.map((file: File) =>
+        this.fileToBase64(file).then((content) => ({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          content,
+        }))
+      )
+
+      const filesData = await Promise.all(filesDataPromises)
+
+      Streamlit.setComponentValue({ files: filesData, message: message })
+    }
+    this.setState({ files: [], message: "" })
+    console.log("Debugging files:", files)
+    document
+      .querySelectorAll('div[style*="position: relative;"]')
+      .forEach((element) => element.remove())
+  }
+
+  // Helper function to convert a file to a Base64 encoded string
+  // Note: This function returns a Promise
+  private fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = (error) => reject(error)
+      reader.readAsDataURL(file)
+    })
+  }
+
+  /** Focus handler for our "Click Me!" button. */
+  private _onFocus = (): void => {
+    this.setState({ isFocused: true })
+  }
+
+  /** Blur handler for our "Click Me!" button. */
+  private _onBlur = (): void => {
+    this.setState({ isFocused: false })
   }
 }
 
