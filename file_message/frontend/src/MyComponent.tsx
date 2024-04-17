@@ -27,7 +27,8 @@ class MyComponent extends StreamlitComponentBase<State> {
 
   public render = (): ReactNode => {
     // Arguments that are passed to the plugin in Python are accessible
-    // via `this.props.args`. Here, we access the "name" arg.
+    // via `this.props.args`.
+    const hint = this.props.args["hint"]
 
     // Streamlit sends us a theme object via props that we can use to ensure
     // that our component has visuals that match the active theme in a
@@ -130,7 +131,7 @@ class MyComponent extends StreamlitComponentBase<State> {
           <input
             type="text"
             className="message-input__input"
-            placeholder="Type a message..."
+            placeholder={hint}
             // style={{ flexGrow: 1, margin: '0 10px' }}
             onChange={this.handleMessageChange}
             onKeyDown={(e) => {
