@@ -29,6 +29,7 @@ class FileChatInput extends StreamlitComponentBase<State> {
     // Arguments that are passed to the plugin in Python are accessible
     // via `this.props.args`.
     const hint = this.props.args["hint"]
+    const previewHeight = "80px"
 
     // Streamlit sends us a theme object via props that we can use to ensure
     // that our component has visuals that match the active theme in a
@@ -60,6 +61,7 @@ class FileChatInput extends StreamlitComponentBase<State> {
       >
         <div
           style={{
+            height: previewHeight,
             display: "flex", // Ensures horizontal layout
             flexDirection: "row", // Explicitly set to row for horizontal stacking
             width: "100%",
@@ -78,7 +80,7 @@ class FileChatInput extends StreamlitComponentBase<State> {
             >
               <img
                 src={file.previewUrl}
-                style={{ maxWidth: "100px", maxHeight: "100px" }}
+                style={{ maxWidth: previewHeight, maxHeight: previewHeight }}
                 alt="preview"
               />
               <button
